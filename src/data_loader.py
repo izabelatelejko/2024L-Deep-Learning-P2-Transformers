@@ -20,7 +20,7 @@ def load_data():
     train_ds, val_ds = tf.keras.utils.audio_dataset_from_directory(
         directory=AUDIO_PATH,
         labels=labels_list,
-        batch_size=BATCH_SIZE,
+        batch_size=None,
         validation_split=VALIDATION_SPLIT,
         seed=SEED,
         output_sequence_length=16000,

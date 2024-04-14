@@ -1,5 +1,7 @@
 # data
 data/*
+augmented_data.npy
+augmented_labels.npy
 
 # vscode
 .vscode/*

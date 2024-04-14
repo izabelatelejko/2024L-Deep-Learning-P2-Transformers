@@ -26,4 +26,11 @@ def load_data():
         output_sequence_length=16000,
         subset="both",
     )
-    return train_ds, val_ds
+    return train_ds.map(squeeze, tf.data.AUTOTUNE), val_ds.map(
+        squeeze, tf.data.AUTOTUNE
+    )
+
+
+def squeeze(audio, labels):
+    audio = tf.squeeze(audio, axis=-1)
+    return audio, labels

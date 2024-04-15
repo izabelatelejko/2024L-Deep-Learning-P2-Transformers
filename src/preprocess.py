@@ -58,31 +58,27 @@ def preprocess_and_save(plot_samples: bool = False):
 
 def load_and_preprocess_for_binary_task(plot_samples: bool = False):
     """Load augmented data, create binary labels, transform data to spectograms, and perform augmentation on spectograms."""
-    print(1)
-    # Load augmented data
+    # Load data
     train_audio_with_augmented, train_labels_with_augmented = load_augmented_data()
+    _, val_ds = load_data()
 
-    print(2)
     # Create binary labels
     train_ds_binary = tf.data.Dataset.from_tensor_slices(
         (train_audio_with_augmented, create_binary_labels(train_labels_with_augmented))
     )
     del train_audio_with_augmented, train_labels_with_augmented
-
-    print(2.5)
-    _, val_ds = load_data()
     val_ds_binary = val_ds.map(lambda x, y: (x, map_val_labels(y)))
     del val_ds
 
-    print(3)
     # Transform to spectograms
     train_ds_specs = transform_to_spectograms(train_ds_binary)
     val_ds_specs = transform_to_spectograms(val_ds_binary)
     del train_ds_binary, val_ds_binary
-    print(4)
+
     # Augment spectograms
     train_ds_specs = augment_spectograms(train_ds_specs)
-    print(5)
+
+    # Plot spectograms
     if plot_samples:
         plot_spectograms(train_ds_specs)
 

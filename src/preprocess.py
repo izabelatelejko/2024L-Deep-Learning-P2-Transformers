@@ -31,7 +31,6 @@ def preprocess_and_save(plot_samples: bool = False):
 
     # Extract data with main labels
     train_audio_main, train_labels_main = extract_main_data(train_audio, train_labels)
-    del train_audio
 
     # Augment data
     augmenter = generate_augmenter()
@@ -40,16 +39,16 @@ def preprocess_and_save(plot_samples: bool = False):
     # Plot augmented samples
     if plot_samples:
         plot_augmented_samples(train_audio_main[0:9], train_audio_main_augmented[0:9])
-    del augmenter
+    del augmenter, train_audio_main
 
     # Combine original and augmented data
     train_audio_with_augmented, train_labels_with_augmented = combine_with_augmented(
-        train_audio_main,
+        train_audio,
         train_audio_main_augmented,
         train_labels,
         train_labels_main,
     )
-    del train_audio_main, train_audio_main_augmented, train_labels, train_labels_main
+    del train_audio, train_audio_main_augmented, train_labels, train_labels_main
 
     # Save original and augmented data
     save_augmented_data(train_audio_with_augmented, train_labels_with_augmented)

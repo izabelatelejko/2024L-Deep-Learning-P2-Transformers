@@ -5,7 +5,6 @@ import numpy as np
 
 
 def plot_single_augmented(non_augmented, augmented, ax):
-    """Plot ."""
     ax.plot(np.arange(0, len(non_augmented)), non_augmented)
     ax.plot(np.arange(0, len(non_augmented)), augmented)
 
@@ -15,3 +14,9 @@ def plot_augmented_samples(non_augmented, augmented):
     for i in range(9):
         plot_single_augmented(non_augmented[i], augmented[i], ax[i // 3, i % 3])
     plt.show()
+
+
+def plot_spectograms(ds, n_samples=3):
+    for audio, _ in ds.take(n_samples):
+        plt.imshow(audio.numpy())
+        plt.show()

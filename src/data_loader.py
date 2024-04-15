@@ -1,7 +1,9 @@
 """Module for loading the data."""
 
 import os
+import random
 
+import numpy as np
 import tensorflow as tf
 
 from src.const import AUDIO_PATH, MAIN_LABELS, BATCH_SIZE, VALIDATION_SPLIT, SEED
@@ -17,6 +19,8 @@ def load_data():
             for _ in os.listdir(os.path.join(AUDIO_PATH, class_dir))
         ]
 
+    np.random.seed(SEED)
+    random.seed(SEED)
     train_ds, val_ds = tf.keras.utils.audio_dataset_from_directory(
         directory=AUDIO_PATH,
         labels=labels_list,

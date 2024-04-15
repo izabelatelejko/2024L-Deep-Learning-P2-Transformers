@@ -1,53 +1,26 @@
 """Module for data preprocessing and augmentation."""
 
-import random
-import warnings
-
-warnings.filterwarnings("ignore")
-
-import numpy as np
 import tensorflow as tf
-import tensorflow_io as tfio
 
 from src.augmenter import generate_augmenter
-from src.const import AUDIO_PATH, MAIN_LABELS, BATCH_SIZE, VALIDATION_SPLIT, SEED
 from src.data_loader import load_data
+from src.preprocess_utils import (
+    augment,
+    augment_spectograms,
+    combine_with_augmented,
+    convert_to_array,
+    create_binary_labels,
+    extract_main_data,
+    load_augmented_data,
+    map_val_labels,
+    save_augmented_data,
+    transform_to_spectograms,
+)
 from src.visualization import plot_augmented_samples, plot_spectograms
 
 
-@tf.autograph.experimental.do_not_convert
-def convert_to_array(ds):
-    return np.asarray(list(ds.map(lambda x, y: x))), np.asarray(
-        list(ds.map(lambda x, y: y))
-    )
-
-
-def extract_main_data(audio, labels):
-    return audio[labels != 10], labels[labels != 10]
-
-
-def augment(audio_array, augmenter):
-    np.random.seed(SEED)
-    random.seed(SEED)
-    return np.apply_along_axis(augmenter, -1, audio_array, sample_rate=16000)
-
-
-def combine_with_augmented(audio, audio_aug, labels, labels_aug):
-    audio_with_aug = np.concatenate([audio, audio_aug], axis=0)
-    labels_with_aug = np.concatenate([labels, labels_aug], axis=0)
-    return audio_with_aug, labels_with_aug
-
-
-def save_augmented_data(audio, labels):
-    np.save("augmented_data.npy", audio)
-    np.save("augmented_labels.npy", labels)
-
-
-def load_augmented_data():
-    return np.load("augmented_data.npy"), np.load("augmented_labels.npy")
-
-
 def preprocess_and_save(plot_samples: bool = False):
+    """Load audio data, augment it, and save the augmented data as numpy array."""
 
     # Load data
     train_ds, _ = load_data()
@@ -84,69 +57,8 @@ def preprocess_and_save(plot_samples: bool = False):
     del train_audio_with_augmented, train_labels_with_augmented
 
 
-def create_binary_labels(labels):
-    """Create binary labels for known vs unknown task. Known classes are labeled as 0, unknown as 1."""
-    binary_labels = np.zeros(labels.shape)
-    binary_labels[labels != 10] = 0
-    binary_labels[labels == 10] = 1
-    return binary_labels
-
-
-def transform_to_spectograms(
-    ds,
-    nfft=512,
-    window=512,
-    stride=256,
-    rate=16000,
-    mels=128,
-    fmin=0,
-    fmax=8000,
-    top_db=80,
-):
-
-    spect_ds = ds.map(
-        map_func=lambda audio, label: (
-            tfio.audio.spectrogram(audio, nfft=nfft, window=window, stride=stride),
-            label,
-        ),
-        num_parallel_calls=tf.data.AUTOTUNE,
-    )
-    mel_spect_ds = spect_ds.map(
-        map_func=lambda audio, label: (
-            tfio.audio.melscale(audio, rate=rate, mels=mels, fmin=fmin, fmax=fmax),
-            label,
-        ),
-        num_parallel_calls=tf.data.AUTOTUNE,
-    )
-    return mel_spect_ds.map(
-        map_func=lambda audio, label: (tfio.audio.dbscale(audio, top_db=top_db), label),
-        num_parallel_calls=tf.data.AUTOTUNE,
-    )
-
-
-def map_val_labels(label):
-    return tf.where(label < 10, 0, 1)
-
-
-def mask_freqs(ds):
-    return ds.map(
-        map_func=lambda audio, label: (tfio.audio.freq_mask(audio, param=5), label),
-        num_parallel_calls=tf.data.AUTOTUNE,
-    )
-
-
-def mask_time(ds):
-    return ds.map(
-        map_func=lambda audio, label: (tfio.audio.time_mask(audio, param=5), label),
-        num_parallel_calls=tf.data.AUTOTUNE,
-    )
-
-
-def augment_spectograms(ds):
-    return mask_freqs(mask_time(ds))
-
-
 def load_and_preprocess_for_binary_task(plot_samples: bool = False):
+    """Load augmented data, create binary labels, transform data to spectograms, and perform augmentation on spectograms."""
     print(1)
     # Load augmented data
     train_audio_with_augmented, train_labels_with_augmented = load_augmented_data()

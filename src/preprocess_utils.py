@@ -6,6 +6,8 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_io as tfio
 
+from tqdm import tqdm
+
 from src.const import AUDIO_PATH, MAIN_LABELS, BATCH_SIZE, VALIDATION_SPLIT, SEED
 
 
@@ -101,3 +103,18 @@ def mask_time(ds):
 
 def augment_spectograms(ds):
     return mask_freqs(mask_time(ds))
+
+
+def dataset_to_np(dataset):
+    dataset = dataset.shuffle(100)
+    dataset_len = tf.data.experimental.cardinality(dataset).numpy()
+    X_filtered = [None for i in range(dataset_len)]
+    y_filtered = [None for i in range(dataset_len)]
+
+    i = 0
+    for X, y in tqdm(dataset, "Processing dataset"):
+        X_filtered[i] = X.numpy()
+        y_filtered[i] = y.numpy()
+        i += 1
+
+    return np.array(X_filtered), np.array(y_filtered)

@@ -15,6 +15,7 @@ from src.preprocess_utils import (
     map_val_labels,
     save_augmented_data,
     transform_to_spectograms,
+    dataset_to_np,
 )
 from src.visualization import plot_augmented_samples, plot_spectograms
 
@@ -56,34 +57,70 @@ def preprocess_and_save(plot_samples: bool = False):
     del train_audio_with_augmented, train_labels_with_augmented
 
 
-def load_and_preprocess_for_binary_task(plot_samples: bool = False):
+def load_and_preprocess(plot_samples: bool = False):
     """Load augmented data, create binary labels, transform data to spectograms, and perform augmentation on spectograms."""
-    print(1)
-    # Load augmented data
+
+    print("Load augmented data")
     train_audio_with_augmented, train_labels_with_augmented = load_augmented_data()
 
-    print(2)
-    # Create binary labels
+    print("Create data with only main classes")
+    train_audio_with_augmented_main = train_audio_with_augmented[
+        train_labels_with_augmented != 10
+    ]
+    train_labels_with_augmented_main = train_labels_with_augmented[
+        train_labels_with_augmented != 10
+    ]
+
+    print("Create binary dataset")
     train_ds_binary = tf.data.Dataset.from_tensor_slices(
         (train_audio_with_augmented, create_binary_labels(train_labels_with_augmented))
     )
     del train_audio_with_augmented, train_labels_with_augmented
 
-    print(2.5)
+    print("Create main dataset")
+    train_ds_main = tf.data.Dataset.from_tensor_slices(
+        (train_audio_with_augmented_main, train_labels_with_augmented_main)
+    )
+    del train_audio_with_augmented_main, train_labels_with_augmented_main
+
     _, val_ds = load_data()
+    val_ds_main = val_ds
     val_ds_binary = val_ds.map(lambda x, y: (x, map_val_labels(y)))
     del val_ds
 
-    print(3)
-    # Transform to spectograms
-    train_ds_specs = transform_to_spectograms(train_ds_binary)
-    val_ds_specs = transform_to_spectograms(val_ds_binary)
-    del train_ds_binary, val_ds_binary
-    print(4)
-    # Augment spectograms
-    train_ds_specs = augment_spectograms(train_ds_specs)
-    print(5)
-    if plot_samples:
-        plot_spectograms(train_ds_specs)
+    print("Transform to spectograms")
+    train_ds_specs_binary = transform_to_spectograms(train_ds_binary)
+    val_ds_specs_binary = transform_to_spectograms(val_ds_binary)
 
-    return train_ds_specs, val_ds_specs
+    train_ds_specs_main = transform_to_spectograms(train_ds_main)
+    val_ds_specs_main = transform_to_spectograms(val_ds_main)
+    del train_ds_main, train_ds_binary, val_ds_binary, val_ds_main
+
+    print("Transform to numpy")
+    train_ds_specs_binary_X, train_ds_specs_binary_y = dataset_to_np(
+        train_ds_specs_binary
+    )
+    val_ds_specs_binary_X, val_ds_specs_binary_y = dataset_to_np(val_ds_specs_binary)
+
+    train_ds_specs_main_X, train_ds_specs_main_y = dataset_to_np(train_ds_specs_main)
+    val_ds_specs_main_X, val_ds_specs_main_y = dataset_to_np(val_ds_specs_main)
+
+    val_ds_specs_main_X = val_ds_specs_main_X[val_ds_specs_main_y != 10]
+    val_ds_specs_main_y = val_ds_specs_main_y[val_ds_specs_main_y != 10]
+
+    # print("Augment spectograms")
+    # train_ds_specs = augment_spectograms(train_ds_specs)
+
+    if plot_samples:
+        plot_spectograms(train_ds_specs_binary)
+
+    return (
+        train_ds_specs_binary_X,
+        train_ds_specs_binary_y,
+        val_ds_specs_binary_X,
+        val_ds_specs_binary_y,
+        train_ds_specs_main_X,
+        train_ds_specs_main_y,
+        val_ds_specs_main_X,
+        val_ds_specs_main_y,
+    )

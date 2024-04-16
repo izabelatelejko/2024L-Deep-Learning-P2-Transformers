@@ -62,6 +62,7 @@ def load_and_preprocess(plot_samples: bool = False):
 
     print("Load augmented data")
     train_audio_with_augmented, train_labels_with_augmented = load_augmented_data()
+    _, val_ds = load_data()
 
     print("Create data with only main classes")
     train_audio_with_augmented_main = train_audio_with_augmented[

@@ -102,9 +102,13 @@ def load_and_preprocess(plot_samples: bool = False):
         train_ds_specs_binary
     )
     val_ds_specs_binary_X, val_ds_specs_binary_y = dataset_to_np(val_ds_specs_binary)
+    del val_ds_specs_binary
 
     train_ds_specs_main_X, train_ds_specs_main_y = dataset_to_np(train_ds_specs_main)
+    del train_ds_specs_main
+
     val_ds_specs_main_X, val_ds_specs_main_y = dataset_to_np(val_ds_specs_main)
+    del val_ds_specs_main
 
     val_ds_specs_main_X = val_ds_specs_main_X[val_ds_specs_main_y != 10]
     val_ds_specs_main_y = val_ds_specs_main_y[val_ds_specs_main_y != 10]
@@ -112,8 +116,8 @@ def load_and_preprocess(plot_samples: bool = False):
     # print("Augment spectograms")
     # train_ds_specs = augment_spectograms(train_ds_specs)
 
-    if plot_samples:
-        plot_spectograms(train_ds_specs_binary)
+    # if plot_samples:
+    #     plot_spectograms(train_ds_specs_binary)
 
     return (
         train_ds_specs_binary_X,

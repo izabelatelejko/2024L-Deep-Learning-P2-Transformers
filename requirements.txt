@@ -1,6 +1,5 @@
 jupyter_client==8.6.0
 jupyter_core==5.5.1
-keras==3.2.1
 matplotlib==3.8.4
 matplotlib-inline==0.1.6
 numpy==1.26.4
@@ -8,12 +7,14 @@ pandas==2.2.2
 pandas-stubs==2.2.1.240316
 scipy==1.11.4
 seaborn==0.13.2
-tensorboard==2.16.2
-tensorboard-data-server==0.7.2
-tensorflow==2.16.1
+tensorboard==2.10.1
+tensorboard-data-server==0.6.1
+tensorflow==2.10.1
+tensorflow-intel==2.10.1
 tensorflow-io==0.31.0
 tensorflow-io-gcs-filesystem==0.31.0
 tqdm==4.66.2
 audiomentations==0.35
 torch==1.12.1
 torchvision==0.13.1
+chardet==5.2.0

@@ -102,6 +102,8 @@ def mask_time(ds):
 
 
 def augment_spectograms(ds):
+    np.random.seed(SEED)
+    random.seed(SEED)
     return mask_freqs(mask_time(ds))
 
 

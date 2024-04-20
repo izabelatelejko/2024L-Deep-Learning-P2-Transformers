@@ -1,9 +1,12 @@
 """Module for data preprocessing and augmentation."""
 
+import random
+import numpy as np
 import tensorflow as tf
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 
+from src.const import SEED
 from src.augmenter import generate_augmenter
 from src.data_loader import load_data
 from src.preprocess_utils import (
@@ -24,6 +27,8 @@ from src.visualization import plot_augmented_samples, plot_spectograms
 
 def preprocess_and_save(plot_samples: bool = False):
     """Load audio data, augment it, and save the augmented data as numpy array."""
+    np.random.seed(SEED)
+    random.seed(SEED)
 
     # Load data
     train_ds, _ = load_data()
@@ -61,6 +66,8 @@ def preprocess_and_save(plot_samples: bool = False):
 
 def load_and_preprocess(plot_samples: bool = False, augment_specs: bool = True):
     """Load augmented data, create binary labels, transform data to spectograms, and perform augmentation on spectograms."""
+    np.random.seed(SEED)
+    random.seed(SEED)
 
     print("Loading augmented data...")
     train_audio_with_augmented, train_labels_with_augmented = load_augmented_data()
@@ -144,6 +151,9 @@ def load_and_preprocess(plot_samples: bool = False, augment_specs: bool = True):
 
 def transform_to_data_loader(X, y, device):
     """Transform numpy arrays to PyTorch DataLoader."""
+    np.random.seed(SEED)
+    random.seed(SEED)
+
     X_t = torch.tensor(X, dtype=torch.float32).to(device)
     y_t = torch.tensor(y, dtype=torch.float32).to(device)
     del X, y

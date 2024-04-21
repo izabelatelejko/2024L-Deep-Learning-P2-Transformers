@@ -6,6 +6,8 @@ import numpy as np
 import tensorflow as tf
 import tensorflow_io as tfio
 
+import librosa
+
 from tqdm import tqdm
 
 from src.const import AUDIO_PATH, MAIN_LABELS, BATCH_SIZE, VALIDATION_SPLIT, SEED
@@ -37,6 +39,11 @@ def combine_with_augmented(audio, audio_aug, labels, labels_aug):
 def save_augmented_data(audio, labels):
     np.save("augmented_data.npy", audio)
     np.save("augmented_labels.npy", labels)
+
+
+def save_data(audio, labels):
+    np.save("data.npy", audio)
+    np.save("labels.npy", labels)
 
 
 def load_augmented_data():
@@ -120,3 +127,10 @@ def dataset_to_np(dataset):
         i += 1
 
     return np.array(X_filtered), np.array(y_filtered)
+
+
+def normalize_ds(ds):
+    for i in tqdm(range(ds.shape[0]), f"Normalizing dataset"):
+        ds[i] = librosa.util.normalize(ds[i])
+
+    return ds

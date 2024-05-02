@@ -163,9 +163,9 @@ def transform_to_data_loader(X, y, device):
     np.random.seed(SEED)
     random.seed(SEED)
 
-    X_t = torch.tensor(X, dtype=torch.float32)
-    
-    y_t = torch.tensor(y, dtype=torch.float32)
+    X_t = torch.tensor(X, dtype=torch.float32).to(device)
+
+    y_t = torch.tensor(y, dtype=torch.float32).to(device)
     del X, y
 
     dataset = TensorDataset(X_t, y_t)

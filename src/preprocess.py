@@ -163,8 +163,9 @@ def transform_to_data_loader(X, y, device):
     np.random.seed(SEED)
     random.seed(SEED)
 
-    X_t = torch.tensor(X, dtype=torch.float32).to(device)
-    y_t = torch.tensor(y, dtype=torch.float32).to(device)
+    X_t = torch.tensor(X, dtype=torch.float32)
+    
+    y_t = torch.tensor(y, dtype=torch.float32)
     del X, y
 
     dataset = TensorDataset(X_t, y_t)
@@ -185,13 +186,18 @@ def get_dl_for_pretrained(
         X = X[y != 10]
         y = y[y != 10]
 
+    print(f"Extracting features for data with size {X.shape}.")
+
     X = np.array(feature_extractor(X, sampling_rate=16000)["input_values"])
+
+    print(f"Splitting data with size {X.shape}.")
 
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25, random_state=42
     )
-
+    print("Transforming training data into loaders...")
     train_dl = transform_to_data_loader(X_train, y_train, device=device)
+    print("Transforming test data into loaders...")
     val_dl = transform_to_data_loader(X_test, y_test, device=device)
 
     return train_dl, val_dl

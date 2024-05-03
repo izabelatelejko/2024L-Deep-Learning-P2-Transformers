@@ -28,7 +28,7 @@ from src.visualization import plot_augmented_samples, plot_spectograms
 from sklearn.model_selection import train_test_split
 
 
-def preprocess_and_save(plot_samples: bool = False, augment: bool = True):
+def preprocess_and_save(plot_samples: bool = False, augment_data: bool = True):
     """Load audio data, augment it, and save the augmented data as numpy array."""
     np.random.seed(SEED)
     random.seed(SEED)
@@ -43,7 +43,7 @@ def preprocess_and_save(plot_samples: bool = False, augment: bool = True):
     # Extract data with main labels
     train_audio_main, train_labels_main = extract_main_data(train_audio, train_labels)
 
-    if augment:
+    if augment_data:
         # Augment data
         augmenter = generate_augmenter()
         train_audio_main_augmented = augment(train_audio_main, augmenter)
@@ -66,11 +66,12 @@ def preprocess_and_save(plot_samples: bool = False, augment: bool = True):
         del train_audio, train_audio_main_augmented, train_labels, train_labels_main
 
         # Save original and augmented data
-        save_augmented_data(train_audio_with_augmented, train_labels_with_augmented)
+        # save_augmented_data(train_audio_with_augmented, train_labels_with_augmented)
         print("Successfully saved augmented data.")
         del train_audio_with_augmented, train_labels_with_augmented
     else:
-        save_data(train_audio, train_labels)
+        pass
+        # save_data(train_audio, train_labels)
 
 
 def load_and_preprocess(plot_samples: bool = False, augment_specs: bool = True):
@@ -143,8 +144,8 @@ def load_and_preprocess(plot_samples: bool = False, augment_specs: bool = True):
     val_ds_specs_main_X = val_ds_specs_main_X[val_ds_specs_main_y != 10]
     val_ds_specs_main_y = val_ds_specs_main_y[val_ds_specs_main_y != 10]
 
-    # if plot_samples:
-    #     plot_spectograms(train_ds_specs_binary)
+    if plot_samples:
+        plot_spectograms(train_ds_specs_binary)
 
     return (
         train_ds_specs_binary_X,
@@ -187,16 +188,16 @@ def get_dl_for_pretrained(
         y = y[y != 10]
 
     print(f"Extracting features for data with size {X.shape}.")
-
     X = np.array(feature_extractor(X, sampling_rate=16000)["input_values"])
 
     print(f"Splitting data with size {X.shape}.")
-
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.25, random_state=42
     )
+
     print("Transforming training data into loaders...")
     train_dl = transform_to_data_loader(X_train, y_train, device=device)
+
     print("Transforming test data into loaders...")
     val_dl = transform_to_data_loader(X_test, y_test, device=device)
 

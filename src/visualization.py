@@ -5,8 +5,8 @@ import numpy as np
 
 
 def plot_single_augmented(non_augmented, augmented, ax):
-    ax.plot(np.arange(0, len(non_augmented)), augmented, alpha=0.7, color="blue")
-    ax.plot(np.arange(0, len(non_augmented)), non_augmented, color="green")
+    ax.plot(np.arange(0, len(non_augmented)), augmented, color="pink")
+    ax.plot(np.arange(0, len(non_augmented)), non_augmented, alpha=0.3, color="blue")
 
 
 def plot_augmented_samples(non_augmented, augmented):

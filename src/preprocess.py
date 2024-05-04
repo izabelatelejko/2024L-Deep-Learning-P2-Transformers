@@ -1,10 +1,13 @@
 """Module for data preprocessing and augmentation."""
 
+import os
 import random
+import librosa
 import numpy as np
 import tensorflow as tf
 import torch
 from torch.utils.data import DataLoader, TensorDataset
+from tqdm import tqdm
 
 from src.const import SEED
 from src.augmenter import generate_augmenter
@@ -204,7 +207,7 @@ def get_dl_for_pretrained(
     return train_dl, val_dl
 
 
-def generate_silence(silence_path):
+def generate_silence(silence_path, augment_count=10):
     silence = np.array([])
 
     for file in os.listdir(silence_path):
@@ -224,7 +227,6 @@ def generate_silence(silence_path):
                 silence = np.concatenate((silence, next_wave), 0)
 
     base_silence = silence
-    augment_count = 10
     for i in tqdm(range(augment_count), "Processing..."):
         augmenter = generate_augmenter()
         augmented_data = augment(base_silence, augmenter)

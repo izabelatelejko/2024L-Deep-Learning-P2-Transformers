@@ -202,3 +202,34 @@ def get_dl_for_pretrained(
     val_dl = transform_to_data_loader(X_test, y_test, device=device)
 
     return train_dl, val_dl
+
+
+def generate_silence(silence_path):
+    silence = np.array([])
+
+    for file in os.listdir(silence_path):
+        wave, sampling = librosa.load(os.path.join(silence_path, file))
+        print(f"File: {file} with sampling: {sampling}")
+        wave_res = librosa.resample(wave, orig_sr=sampling, target_sr=16000)
+        indices = [i for i in range(0, wave_res.shape[0], 16000)]
+        indices.append(wave_res.shape[0])
+
+        for i in range(len(indices) - 1):
+            next_wave = np.expand_dims(wave_res[indices[i] : indices[i + 1]], 0)
+            if next_wave.shape[1] != 16000:
+                break
+            if not silence.any():
+                silence = next_wave
+            else:
+                silence = np.concatenate((silence, next_wave), 0)
+
+    base_silence = silence
+    augment_count = 10
+    for i in tqdm(range(augment_count), "Processing..."):
+        augmenter = generate_augmenter()
+        augmented_data = augment(base_silence, augmenter)
+
+        silence = np.concatenate((silence, augmented_data), 0)
+
+    with open("silence.npy", "wb") as f:
+        np.save(f, silence)

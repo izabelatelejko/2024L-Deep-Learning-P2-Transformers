@@ -169,6 +169,7 @@ def transform_to_data_loader(X, y, device):
     """Transform numpy arrays to PyTorch DataLoader."""
     np.random.seed(SEED)
     random.seed(SEED)
+    torch.manual_seed(SEED)
 
     X_t = torch.tensor(X, dtype=torch.float32)
 
@@ -210,7 +211,7 @@ def get_dl_for_pretrained(
     return train_dl, val_dl
 
 
-def generate_silence(silence_path, augment_count = 10):
+def generate_silence(silence_path, augment_count=10):
     silence = np.array([])
 
     for file in os.listdir(silence_path):
@@ -264,3 +265,21 @@ def preprare_data_from_ds(X, samplerate=16000, numcep=20):
                 y_list.append(10)
 
     return np.array(X_list), np.array(y_list)
+
+
+def preprocess_silence(silence, samplerate=16000, numcep=20):
+    silence_list = []
+
+    for i in tqdm(range(silence.shape[0]), "Processing..."):
+        mfcc_feat = mfcc(
+            librosa.util.fix_length(silence[i], size=16000),
+            samplerate=samplerate,
+            numcep=numcep,
+        )
+        scaler = MinMaxScaler(feature_range=(0, 1))
+        scaler = scaler.fit(mfcc_feat)
+        normalized = scaler.transform(mfcc_feat)
+
+        silence_list.append(normalized)
+
+    return np.array(silence_list)

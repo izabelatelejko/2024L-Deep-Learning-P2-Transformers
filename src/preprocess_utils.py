@@ -53,7 +53,6 @@ def load_augmented_data():
 def create_binary_labels(labels):
     """Create binary labels for known vs unknown task. Known classes are labeled as 0, unknown as 1."""
     binary_labels = np.zeros(labels.shape)
-    binary_labels[labels != 10] = 0
     binary_labels[labels == 10] = 1
     return binary_labels
 

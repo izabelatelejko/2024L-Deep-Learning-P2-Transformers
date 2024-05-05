@@ -167,8 +167,9 @@ def load_and_preprocess(plot_samples: bool = False, augment_specs: bool = True):
 
 def transform_to_data_loader(X, y, device):
     """Transform numpy arrays to PyTorch DataLoader."""
-    np.random.seed(SEED)
+    torch.manual_seed(SEED)
     random.seed(SEED)
+    np.random.seed(SEED)
 
     X_t = torch.tensor(X, dtype=torch.float32)
 
@@ -210,7 +211,7 @@ def get_dl_for_pretrained(
     return train_dl, val_dl
 
 
-def generate_silence(silence_path, augment_count = 10):
+def generate_silence(silence_path, augment_count=10):
     silence = np.array([])
 
     for file in os.listdir(silence_path):

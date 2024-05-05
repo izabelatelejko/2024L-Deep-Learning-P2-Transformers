@@ -167,9 +167,9 @@ def load_and_preprocess(plot_samples: bool = False, augment_specs: bool = True):
 
 def transform_to_data_loader(X, y, device):
     """Transform numpy arrays to PyTorch DataLoader."""
-    np.random.seed(SEED)
-    random.seed(SEED)
     torch.manual_seed(SEED)
+    random.seed(SEED)
+    np.random.seed(SEED)
 
     X_t = torch.tensor(X, dtype=torch.float32)
 

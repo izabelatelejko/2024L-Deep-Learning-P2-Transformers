@@ -5,6 +5,9 @@ augmented_labels.npy
 data.npy
 labels.npy
 silence.npy
+X_*
+y_*
+sound.npy
 
 # vscode
 .vscode/*

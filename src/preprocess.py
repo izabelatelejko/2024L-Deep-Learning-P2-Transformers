@@ -265,3 +265,21 @@ def preprare_data_from_ds(X, samplerate=16000, numcep=20):
                 y_list.append(10)
 
     return np.array(X_list), np.array(y_list)
+
+
+def preprocess_silence(silence, samplerate=16000, numcep=20):
+    silence_list = []
+
+    for i in tqdm(range(silence.shape[0]), "Processing..."):
+        mfcc_feat = mfcc(
+            librosa.util.fix_length(silence[i], size=16000),
+            samplerate=samplerate,
+            numcep=numcep,
+        )
+        scaler = MinMaxScaler(feature_range=(0, 1))
+        scaler = scaler.fit(mfcc_feat)
+        normalized = scaler.transform(mfcc_feat)
+
+        silence_list.append(normalized)
+
+    return np.array(silence_list)

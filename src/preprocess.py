@@ -2,12 +2,15 @@
 
 import os
 import random
-import librosa
 import numpy as np
 import tensorflow as tf
 import torch
 from torch.utils.data import DataLoader, TensorDataset
+
+import librosa
 from tqdm import tqdm
+from python_speech_features import mfcc
+from sklearn.preprocessing import MinMaxScaler
 
 from src.const import SEED
 from src.augmenter import generate_augmenter
@@ -207,7 +210,7 @@ def get_dl_for_pretrained(
     return train_dl, val_dl
 
 
-def generate_silence(silence_path, augment_count=10):
+def generate_silence(silence_path, augment_count = 10):
     silence = np.array([])
 
     for file in os.listdir(silence_path):
@@ -235,3 +238,29 @@ def generate_silence(silence_path, augment_count=10):
 
     with open("silence.npy", "wb") as f:
         np.save(f, silence)
+
+
+def preprare_data_from_ds(X, samplerate=16000, numcep=20):
+
+    X_list = []
+    y_list = []
+
+    for i in tqdm(range(X.shape[0]), "Processing..."):
+        if X[i]["label"] != 30:
+            mfcc_feat = mfcc(
+                librosa.util.fix_length(X[i]["audio"]["array"], size=16000),
+                samplerate=samplerate,
+                numcep=numcep,
+            )
+            scaler = MinMaxScaler(feature_range=(0, 1))
+            scaler = scaler.fit(mfcc_feat)
+            normalized = scaler.transform(mfcc_feat)
+
+            X_list.append(normalized)
+
+            if X[i]["label"] < 10:
+                y_list.append(X[i]["label"])
+            else:
+                y_list.append(10)
+
+    return np.array(X_list), np.array(y_list)

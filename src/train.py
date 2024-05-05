@@ -24,6 +24,8 @@ def train_model(
     val_losses = []
     best_val_loss = float("inf")
     no_improve_count = 0
+    is_stopped_early = False
+    best_model_dict = None
 
     torch.manual_seed(SEED)
     random.seed(SEED)
@@ -115,11 +117,15 @@ def train_model(
         if val_loss < best_val_loss:
             best_val_loss = val_loss
             no_improve_count = 0
+            best_model_dict = model.state_dict()
         else:
             no_improve_count += 1
 
         if no_improve_count >= patience:
             print("Early stopping")
+            is_stopped_early = True
             break
 
+    if is_stopped_early:
+        model.load_state_dict(best_model_dict)
     return train_losses, val_losses

@@ -215,6 +215,9 @@ def generate_silence(silence_path, augment_count=10):
     silence = np.array([])
 
     for file in os.listdir(silence_path):
+        if file == "README.md":
+            continue
+
         wave, sampling = librosa.load(os.path.join(silence_path, file))
         print(f"File: {file} with sampling: {sampling}")
         wave_res = librosa.resample(wave, orig_sr=sampling, target_sr=16000)

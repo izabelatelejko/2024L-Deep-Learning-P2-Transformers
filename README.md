@@ -5,6 +5,12 @@ The aim of the project is to test and compare different network architectures fo
 
 ![plot](task_flow.png)
 
+To setup the environment run:
+
+```{sh}
+pip install -r requirements.txt
+```
+
 We assume the following directory structure under root for storing data:
 
 ```{sh}

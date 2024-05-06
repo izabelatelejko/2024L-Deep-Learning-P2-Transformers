@@ -2,15 +2,13 @@
 
 import random
 
+import librosa
 import numpy as np
 import tensorflow as tf
 import tensorflow_io as tfio
-
-import librosa
-
 from tqdm import tqdm
 
-from src.const import AUDIO_PATH, MAIN_LABELS, BATCH_SIZE, VALIDATION_SPLIT, SEED
+from src.const import SEED
 
 
 @tf.autograph.experimental.do_not_convert

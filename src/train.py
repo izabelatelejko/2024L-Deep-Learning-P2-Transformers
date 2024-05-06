@@ -1,9 +1,12 @@
-from tqdm import tqdm
-import torch
-import random
-import numpy as np
+"""Module for training related functions."""
 
-SEED = 123
+import random
+
+import numpy as np
+import torch
+from tqdm import tqdm
+
+from src.const import SEED
 
 
 def train_model(

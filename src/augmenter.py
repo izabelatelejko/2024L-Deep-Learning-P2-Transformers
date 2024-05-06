@@ -1,6 +1,6 @@
 """Augmenter for data augmentation."""
 
-from audiomentations import TimeStretch, PitchShift, Shift, OneOf, AddColorNoise
+from audiomentations import AddColorNoise, OneOf, PitchShift, Shift, TimeStretch
 
 
 def generate_augmenter():

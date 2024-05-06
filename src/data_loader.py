@@ -6,7 +6,7 @@ import random
 import numpy as np
 import tensorflow as tf
 
-from src.const import AUDIO_PATH, MAIN_LABELS, BATCH_SIZE, VALIDATION_SPLIT, SEED
+from src.const import AUDIO_PATH, MAIN_LABELS, SEED, VALIDATION_SPLIT
 
 
 def load_data():
